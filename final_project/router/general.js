@@ -22,6 +22,7 @@ public_users.post("/register", (req,res) => {
   return res.status(404).json({message: "Unable to register user."}); 
 });
 
+// Common Functions
 // Common Promise callback
 function getBooksPromise(url) {
   return new Promise((resolve, reject) => {
@@ -30,6 +31,17 @@ function getBooksPromise(url) {
       .catch(error => reject(error));
   });
 }
+
+// Commom async function
+async function getBooksAsync(url) {
+  try {
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    throw error; 
+  }
+}
+
 
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
@@ -54,6 +66,17 @@ public_users.get('/promise', function (req, res) {
   }
 });
 
+//Get Book list with Async
+public_users.get('/async', async function (req, res) {
+  try {
+    const bookList = await getBooksAsync('http://localhost:5000/'); //
+    res.json(bookList);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error retrieving book list" });
+  }
+});
+
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn',function (req, res) {
   //Write your code here
@@ -68,8 +91,8 @@ public_users.get('/isbn/:isbn',function (req, res) {
  // Get book details based on ISBN with Promise callback
 public_users.get('/promise/isbn/:isbn', function (req, res) {
   try {
-    const requestedIsbn = req.params.isbn;
-    getBooksPromise("http://localhost:5000/isbn/" + requestedIsbn) 
+    const isbn = req.params.isbn;
+    getBooksPromise("http://localhost:5000/isbn/" + isbn) 
       .then(book => {
         res.json(book);
       })
@@ -80,6 +103,18 @@ public_users.get('/promise/isbn/:isbn', function (req, res) {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+// Get book details based on ISBN using Async
+public_users.get('/async/isbn/:isbn', async function (req, res) {
+  try {
+    const isbn = req.params.isbn;
+    const book = await getBooksAsync("http://localhost:5000/isbn/" + isbn);
+    res.json(book);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error retrieving book details" });
   }
 });
   
@@ -105,8 +140,8 @@ public_users.get('/author/:author',function (req, res) {
 //Get book details based on author using Promise callback 
 public_users.get('/promise/author/:author', function (req, res) {
   try {
-    const requestedAuthor = req.params.author;
-    getBooksPromise("http://localhost:5000/author/" + requestedAuthor) 
+    const author = req.params.author;
+    getBooksPromise("http://localhost:5000/author/" + author) 
       .then(book => {
         res.json(book);
       })
@@ -117,6 +152,18 @@ public_users.get('/promise/author/:author', function (req, res) {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+//Get book details based on Author using Async
+public_users.get('/async/author/:author', async function (req, res) {
+  try {
+    const author = req.params.author;
+    const book = await getBooksAsync("http://localhost:5000/author/" + author);
+    res.json(book);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error retrieving book details" });
   }
 });
 
@@ -133,11 +180,11 @@ public_users.get('/title/:title',function (req, res) {
   }
 });
 
-//Get all books bases on title using Promise callback
+//Get all books based on title using Promise callback
 public_users.get('/promise/title/:title', function (req, res) {
   try {
-    const requestedTitle = req.params.title;
-    getBooksPromise("http://localhost:5000/title/" + requestedTitle) 
+    const title = req.params.title;
+    getBooksPromise("http://localhost:5000/title/" + title) 
       .then(book => {
         res.json(book);
       })
@@ -150,6 +197,19 @@ public_users.get('/promise/title/:title', function (req, res) {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
+//Get all books based on title using Async
+public_users.get('/async/title/:title', async function (req, res) {
+  try {
+    const title = req.params.title;
+    const book = await getBooksAsync("http://localhost:5000/title/" + title);
+    res.json(book);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error retrieving book details" });
+  }
+});
+
 
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
